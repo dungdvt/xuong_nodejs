@@ -1,85 +1,72 @@
-import Genre from "../models/genreModel.js";
+import { StatusCodes } from "http-status-codes";
+import Genre from "../models/GenreModel";
+import ApiError from "../utils/apiError";
+
 class GenresController {
-    async getAllGenres(req, res) {
-        try {
-            const genreList = await Genre.find();
-            res.status(200).json({
-                message: " get all genres",
-                data: genreList,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  // GET /genres
+  async getAllGenres(req, res, next) {
+    try {
+      const genres = await Genre.find();
+      res.status(StatusCodes.OK).json({
+        message: "Get All Genres Done",
+        data: genres,
+      });
+    } catch (error) {
+      next(error);
     }
-    async getGenresDetail(req, res) {
-        try {
-            const genre = await Genre.findById(req.params.id);
-            if(!genre) {
-                return res.status(404).json({
-                    message: " not found genres"
-                })
-            }
-            res.status(200).json({
-                message: " get genres detail",
-                data: genre,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // GET /genres/:id
+  async getGenreDetail(req, res, next) {
+    try {
+      const genre = await Genre.findById(req.params.id);
+
+      if (!genre) throw new ApiError(404, "Genre Not Found");
+      res.status(StatusCodes.OK).json({
+        message: "Get Genre Detail Done",
+        data: genre,
+      });
+    } catch (error) {
+      next(error);
     }
-    async createGenres(req, res) {
-        try {
-            const genre = await Genre.create(req.body);
-            res.status(201).json({
-                message: " create genres ",
-                data: genre,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // POST /genres
+  async createGenre(req, res, next) {
+    try {
+      const newGenre = await Genre.create(req.body);
+      res.status(StatusCodes.CREATED).json({
+        message: "Create Genre Successfull",
+        data: newGenre,
+      });
+    } catch (error) {
+      next(error);
     }
-    async updateGenres(req, res) {
-        try {
-            const genre = await Genre.findByIdAndUpdate(req.params.id, req.body, {
-                new: true
-            });
-            if(!genre) {
-                return res.status(404).json({
-                    message: " not found genres"
-                })
-            }
-            res.status(200).json({
-                message: " update genres ",
-                data: genre,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // PUT /genres/:id
+  async updateGenre(req, res, next) {
+    try {
+      const genre = await Genre.findByIdAndUpdate(req.params.id, req.body);
+      if (!genre) throw new ApiError(404, "Genre Not Found");
+      const updateGenre = await Genre.findById(req.params.id);
+      res.status(StatusCodes.OK).json({
+        message: "Update Genre Successfull",
+        data: updateGenre,
+      });
+    } catch (error) {
+      next(error);
     }
-    async deleteGenres(req, res) {
-        try {
-            const genre = await Genre.findByIdAndDelete(req.params.id);
-            if(!genre) {
-                return res.status(404).json({
-                    message: " not found genres"
-                })
-            }
-            res.status(200).json({
-                message: " delete genres ",
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // DELETE /genres/:id
+  async deleteGenre(req, res, next) {
+    try {
+      const genre = await Genre.findByIdAndDelete(req.params.id);
+      if (!genre) throw new ApiError(404, "Genre Not Found");
+      res.status(StatusCodes.OK).json({
+        message: "Delete Genre Done",
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 }
-export default GenresController
+
+export default GenresController;

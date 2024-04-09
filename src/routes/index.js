@@ -1,12 +1,21 @@
-import moviesRouter from "./movies.js";
-import categoriesRouter from "./categories.js";
-import genresRouter from "./genres.js";
+import { Router } from "express";
 
-export default function routes(app) {
-  app.get("/", (req, res) => {
-    res.send("Home");
-  });
-  app.use("/movies", moviesRouter);
-  app.use("/categories", categoriesRouter);
-  app.use("/genres", genresRouter);
-}
+// import moviesRouter from "./movies";
+import categoriesRouter from "./categories.js";
+// import genresRouter from "./genres";
+// import authRouter from "./auth";
+// import imagesRouter from "./images";
+
+const router = Router();
+
+router.get("/", (req, res) => {
+  res.send("Home");
+});
+
+// router.use("/auth", authRouter);
+// router.use("/movies", moviesRouter);
+router.use("/categories", categoriesRouter);
+// router.use("/genres", genresRouter);
+// router.use("/images", imagesRouter);
+
+export default router;

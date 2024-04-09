@@ -1,85 +1,75 @@
+import { StatusCodes } from "http-status-codes";
 import Category from "../models/categoriesModel.js";
+import ApiError from "../utils/apiError.js";
+
 class CategoriesController {
-    async getAllCategories(req, res) {
-        try {
-            const categoryList = await Category.find();
-            res.status(200).json({
-                message: " get all categories",
-                data: categoryList,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  // GET /categories
+  async getAllCategories(req, res, next) {
+    try {
+      const categories = await Category.find();
+      res.status(StatusCodes.OK).json({
+        message: "Get All Categories Done",
+        data: categories,
+      });
+    } catch (error) {
+      next(error);
     }
-    async getCategoriesDetail(req, res) {
-        try {
-            const category = await Category.findById(req.params.id);
-            if(!category) {
-                return res.status(404).json({
-                    message: " not found categories"
-                })
-            }
-            res.status(200).json({
-                message: " get categories detail",
-                data: category,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // GET /categories/:id
+  async getCategoryDetail(req, res, next) {
+    try {
+      const category = await Category.findById(req.params.id);
+
+      if (!category) throw new ApiError(404, "Category Not Found");
+      res.status(StatusCodes.OK).json({
+        message: "Get Category Detail Done",
+        data: category,
+      });
+    } catch (error) {
+      next(error);
     }
-    async createCategories(req, res) {
-        try {
-            const category = await Category.create(req.body);
-            res.status(201).json({
-                message: " create categories ",
-                data: category,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // POST /categories
+  async createCategory(req, res, next) {
+    try {
+      const newCategory = await Category.create(req.body);
+      res.status(StatusCodes.CREATED).json({
+        message: "Create Category Successfull",
+        data: newCategory,
+      });
+    } catch (error) {
+      next(error);
     }
-    async updateCategories(req, res) {
-        try {
-            const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
-                new: true
-            });
-            if(!category) {
-                return res.status(404).json({
-                    message: " not found categories"
-                })
-            }
-            res.status(200).json({
-                message: " update categories ",
-                data: category,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // PUT /categories/:id
+  async updateCategory(req, res, next) {
+    try {
+      const category = await Category.findByIdAndUpdate(
+        req.params.id,
+        req.body
+      );
+      if (!category) throw new ApiError(404, "Category Not Found");
+      const updateCategory = await Category.findById(req.params.id);
+      res.status(StatusCodes.OK).json({
+        message: "Update Category Successfull",
+        data: updateCategory,
+      });
+    } catch (error) {
+      next(error);
     }
-    async deleteCategories(req, res) {
-        try {
-            const category = await Category.findByIdAndDelete(req.params.id);
-            if(!category) {
-                return res.status(404).json({
-                    message: " not found categories"
-                })
-            }
-            res.status(200).json({
-                message: " delete categories ",
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // DELETE /categories/:id
+  async deleteCategory(req, res, next) {
+    try {
+      const category = await Category.findByIdAndDelete(req.params.id);
+      if (!category) throw new ApiError(404, "Category Not Found");
+      res.status(StatusCodes.OK).json({
+        message: "Delete Category Done",
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 }
-export default CategoriesController
+
+export default CategoriesController;

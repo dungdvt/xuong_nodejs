@@ -1,88 +1,76 @@
-import Movie from "../models/movieModel.js";
+import { StatusCodes } from "http-status-codes";
+import Movie from "../models/movieModel";
+import ApiError from "../utils/apiError";
+
 class MoviesController {
-    // Get /movies/
-    async getAllMovies(req, res) {
-        try {
-            const movies = await Movie.find().populate("category");
-            res.status(200).json({
-                message: "get all movies done",
-                data: movies,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  // GET /movies
+  async getAllMovies(req, res, next) {
+    try {
+      const movies = await Movie.find().populate(["category", "genres"]);
+      res.status(StatusCodes.OK).json({
+        message: "Get All Movies Done",
+        data: movies,
+      });
+    } catch (error) {
+      next(error);
     }
-    // Get /movies/:id
-    async getMoviesDetails(req, res) {
-        try {
-            const movie = await Movie.findById(req.params.id).populate("category").populate("genres");
-            if (!movie) {
-                return res.status(404).json({
-                    message: "movie not found",
-                });
-            }
-            res.status(200).json({
-                message: "get movie detail done",
-                data: movie,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // GET /movies/:id
+  async getMovieDetail(req, res, next) {
+    try {
+      const movie = await Movie.findById(req.params.id)
+        .populate("category")
+        .populate("genres");
+      if (!movie) throw new ApiError(404, "Movie Not Found");
+      res.status(StatusCodes.OK).json({
+        message: "Get Movie Detail Done",
+        data: movie,
+      });
+    } catch (error) {
+      next(error);
     }
-    // Post /movies/
-    async createMovies(req, res) {
-        // res.send("Get all laptops");
-        console.log(req.body);
-        try {
-            const movies = await Movie.create(req.body);
-            res.status(201).json({
-                message: " create movies success!",
-                data: movies
-            })
-        } catch (error) {
-            res.status(400).json({ message: error.message });
-        }
+  }
+  // POST /movies
+  async createMovie(req, res, next) {
+    try {
+      const newMovie = await Movie.create({
+        ...req.body,
+        user: res.locals.id,
+      });
+      res.status(StatusCodes.CREATED).json({
+        message: "Create Movie Successfull",
+        data: newMovie,
+      });
+    } catch (error) {
+      next(error);
     }
-    // Put /movies/
-    async updateMovies(req, res) {
-        // res.send("Get all laptops");
-        try {
-            const movies = await Laptops.findByIdAndUpdate(req.params.id, req.body, {
-                new: true,
-            });
-            if (!movies) {
-                res.status(404).json({ message: "moviess not found!" });
-            }
-            res.status(200).json({
-                message: "update movies success!",
-                data: movies
-            })
-        } catch (error) {
-            res.status(400).json({ message: error.message })
-        }
+  }
+  // PUT /movies/:id
+  async updateMovie(req, res, next) {
+    try {
+      const movie = await Movie.findByIdAndUpdate(req.params.id, req.body);
+      if (!movie) throw new ApiError(404, "Movie Not Found");
+      const updateMovie = await Movie.findById(req.params.id);
+      res.status(StatusCodes.OK).json({
+        message: "Update Movie Successfull",
+        data: updateMovie,
+      });
+    } catch (error) {
+      next(error);
     }
-    // Delete /movies/
-    async deleteMovies(req, res) {
-        try {
-            const movie = await Movie.findByIdAndDelete(req.params.id);
-            if (!movie) {
-                return res.status(404).json({
-                    message: "movie not found",
-                });
-            }
-            res.status(200).json({
-                message: "delete movie done",
-                data: movie,
-            })
-        } catch (error) {
-            res.status(400).json({
-                message: error.message,
-            })
-        }
+  }
+  // DELETE /movies/:id
+  async deleteMovie(req, res, next) {
+    try {
+      const movie = await Movie.findByIdAndDelete(req.params.id);
+      if (!movie) throw new ApiError(404, "Movie Not Found");
+      res.status(StatusCodes.OK).json({
+        message: "Delete Movie Done",
+      });
+    } catch (error) {
+      next(error);
     }
+  }
 }
+
 export default MoviesController;

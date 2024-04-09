@@ -1,13 +1,15 @@
-import express from "express";
-import MoviesController from "../controllers/movies.js";
+import { Router } from "express";
+import MoviesController from "../controllers/movies";
+import { checkPermission } from "../middlewares/checkPermision";
 
-const moviesRouter = express.Router();
+const moviesRouter = Router();
+
 const moviesController = new MoviesController();
 
-moviesRouter.get('/',moviesController.getAllMovies);
-moviesRouter.get('/:id',moviesController.getMoviesDetails);
-moviesRouter.post('/',moviesController.createMovies);
-moviesRouter.put('/:id',moviesController.updateMovies);
-moviesRouter.delete('/:id',moviesController.deleteMovies);
+moviesRouter.get("/", moviesController.getAllMovies);
+moviesRouter.post("/", checkPermission, moviesController.createMovie);
+moviesRouter.get("/:id", moviesController.getMovieDetail);
+moviesRouter.put("/:id", checkPermission, moviesController.updateMovie);
+moviesRouter.delete("/:id", checkPermission, moviesController.deleteMovie);
 
 export default moviesRouter;
